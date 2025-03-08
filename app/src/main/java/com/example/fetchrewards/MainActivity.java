@@ -94,7 +94,8 @@ public class MainActivity extends AppCompatActivity {
             }
 
             // sort items by list id and then by name
-            Collections.sort(items, Comparator.comparingInt((Item i) -> i.listId).thenComparing(i -> i.name));
+            Collections.sort(items, Comparator.comparingInt((Item i) ->
+                    Integer.parseInt(i.name.split(" ")[1])));
 
         } catch (Exception e) {
             throw new RuntimeException(e);

@@ -1,19 +1,11 @@
 package com.example.fetchrewards;
 import android.os.Bundle;
-import android.widget.ArrayAdapter;
 import android.widget.GridLayout;
-import android.widget.LinearLayout;
 import android.widget.ScrollView;
-import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleObserver;
-import androidx.lifecycle.OnLifecycleEvent;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -70,21 +62,30 @@ public class MainActivity extends AppCompatActivity {
     private List<Item> fetchItems() {
         List<Item> items = new ArrayList<>();
         try {
+            // fetch data from url
             URL url = new URL("https://fetch-hiring.s3.amazonaws.com/hiring.json");
+
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
             BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 
             StringBuilder jsonString = new StringBuilder();
             String line;
+
             while ((line = reader.readLine()) != null) {
                 jsonString.append(line);
             }
 
             JSONArray jsonArray = new JSONArray(jsonString.toString());
+
             for (int i = 0; i < jsonArray.length(); i++) {
+
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
+
                 int id = jsonObject.getInt("id");
+
                 int listId = jsonObject.getInt("listId");
+
                 String name = jsonObject.optString("name", null);
 
                 if (name != "null" && !name.trim().isEmpty()) {
@@ -96,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
             Collections.sort(items, Comparator.comparingInt((Item i) -> i.listId).thenComparing(i -> i.name));
 
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return items;
     }
@@ -113,12 +114,12 @@ public class MainActivity extends AppCompatActivity {
             groupedItems.get(item.listId).add(item);
         }
 
-        String text = "";
+
         for (Map.Entry<Integer, ArrayList<Item>> entry : groupedItems.entrySet()) {
             TextView textView = new TextView(this);
 
             // reset text for next list
-            text="";
+            String text = "";
 
             // format each header
             text += "List ID: " + entry.getKey() + "\t\n";
